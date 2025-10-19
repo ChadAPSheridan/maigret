@@ -5,10 +5,14 @@ RUN pip install --no-cache-dir --upgrade pip
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
       gcc \
+      build-essential \
+      pkg-config \
       musl-dev \
       libxml2 \
       libxml2-dev \
       libxslt-dev \
+      libcairo2-dev \
+      libpango1.0-dev \
     && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 COPY . .

@@ -112,6 +112,40 @@ docker run -v /mydir:/app/reports soxoj/maigret:latest username --html
 docker build -t maigret .
 ```
 
+#### Docker Troubleshooting
+
+**DNS Resolution Issues**: If you encounter DNS resolution errors like `gaierror: [Errno -3] Temporary failure in name resolution` or `DNS server refused query`, this is often caused by custom DNS configurations (e.g., Tailscale, VPN, or corporate networks). To fix this:
+
+```bash
+# For web interface with DNS fix
+docker run --network host --dns=8.8.8.8 --dns=1.1.1.1 --dns=9.9.9.9 \
+  -v /path/to/reports:/app/reports maigret:latest --web 9000
+
+# For command-line usage with DNS fix  
+docker run --dns=8.8.8.8 --dns=1.1.1.1 --dns=9.9.9.9 \
+  -v /path/to/reports:/app/reports maigret:latest username --html
+```
+
+Alternatively, use Docker Compose with DNS configuration:
+
+```yaml
+version: '3.8'
+services:
+  maigret:
+    image: maigret:latest
+    ports:
+      - "9000:9000"
+    volumes:
+      - /path/to/reports:/app/reports
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1 
+      - 9.9.9.9
+    environment:
+      - FLASK_HOST=0.0.0.0
+    command: ["--web", "9000"]
+```
+
 ## Usage examples
 
 ```bash
@@ -152,7 +186,15 @@ Instructions:
 ```console
 maigret --web 5000
 ```
-2. Open http://127.0.0.1:5000 in your browser and enter one or more usernames to make a search.
+
+**For Docker users experiencing DNS issues:**
+```console
+# Use this command if you encounter DNS resolution errors
+docker run --network host --dns=8.8.8.8 --dns=1.1.1.1 --dns=9.9.9.9 \
+  -v /path/to/reports:/app/reports maigret:latest --web 9000
+```
+
+2. Open http://127.0.0.1:5000 (or http://127.0.0.1:9000 for Docker) in your browser and enter one or more usernames to make a search.
 
 3. Wait a bit for the search to complete and view the graph with results, the table with all accounts found, and download reports of all formats.
 
